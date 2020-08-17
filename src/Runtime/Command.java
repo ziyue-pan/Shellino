@@ -1,6 +1,7 @@
 package Runtime;
 
 import Interpreter.Interpreter;
+import Utilities.Common;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ public class Command implements Runnable {
 
     public ArrayList<String> args;
     public boolean background;
+    public boolean running;
 
     public IOType input_type, output_type;
     public PipedInputStream pipe_in;
@@ -19,7 +21,7 @@ public class Command implements Runnable {
     public Command() {
         name = "";
         args = new ArrayList<>();
-        background = false;
+        background = running = false;
         input_type = IOType.ARGS_IN;
         output_type = IOType.CONSOLE_OUT;
         pipe_in = new PipedInputStream();
@@ -29,19 +31,17 @@ public class Command implements Runnable {
 
     @Override
     public void run() {
+        running = true;
         InputStream in = null;
         OutputStream out = null;
         switch (input_type) {
             case REDIRECT_IN:
                 try {
-                    in = new FileInputStream(infile);
+                    in = new FileInputStream(Common.GetAbsolutePath(infile));
                 } catch (Exception e) {
-                    try {
-                        in = new FileInputStream(Executor.variables.get("PWD") + "/" + infile);
-                    } catch (Exception ee) {
-                        System.out.println("[RuntimeError] Failed to create input stream.");
-                        return;
-                    }
+                    System.out.println(
+                            "[RuntimeError] Failed to create input stream from " + infile);
+                    return;
                 }
                 break;
             case PIPE_IN:
@@ -67,12 +67,14 @@ public class Command implements Runnable {
         switch (output_type) {
             case REDIRECT_OUT:
                 try {
-                    out = new FileOutputStream(outfile);
+                    out = new FileOutputStream(Common.GetAbsolutePath(outfile));
                 } catch (Exception e) {
                     try {
-                        out = new FileOutputStream(Executor.variables.get("PWD") + "/" + infile);
+                        File file = new File(Common.GetAbsolutePath(outfile));
+                        file.createNewFile();
+                        out = new FileOutputStream(Common.GetAbsolutePath(outfile));
                     } catch (Exception ee) {
-                        System.out.println("[RuntimeError] Failed to create output stream.");
+                        System.out.println("[RuntimeError] Failed to create output stream to" + outfile);
                         return;
                     }
                 }
@@ -98,11 +100,23 @@ public class Command implements Runnable {
         }
 
         switch (name) {
+            case "bg":
+                CMD.bg(in);
+                break;
+            case "cd":
+                CMD.cd(in);
+                break;
             case "clr":
                 CMD.clr();
                 break;
-            case"echo":
+            case "dir":
+                CMD.dir(in, out);
+                break;
+            case "echo":
                 CMD.echo(in, out);
+                break;
+            case "environ":
+                CMD.environ(out);
                 break;
             case "time":
                 CMD.time(out);

@@ -1,5 +1,7 @@
 package Utilities;
 
+import Runtime.*;
+
 public class Common {
     public static final String RESET = "\033[0m";
     public static final String RED_BOLD = "\033[1;31m";
@@ -27,6 +29,14 @@ public class Common {
                 break;
         }
         System.out.print(colored_msg);
+    }
+
+    public static String GetAbsolutePath(String given_path) {
+        if (given_path.charAt(0) == '/') {
+            return given_path;
+        } else {
+            return Executor.variables.get("PWD") + "/" + given_path;
+        }
     }
 
 }

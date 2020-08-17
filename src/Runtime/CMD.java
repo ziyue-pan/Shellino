@@ -1,26 +1,57 @@
 package Runtime;
 
 import Interpreter.Data;
+import Interpreter.Interpreter;
+import Utilities.Common;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Date;
+import java.util.Map.Entry;
 import java.util.Scanner;
 
 public class CMD {
 
-    // TODO bg
     // 用法：
     // ① bg %<pid>
-    public static void bg() {
-        System.out.println("bg");
+    public static void bg(InputStream in) {
+        try {
+            Scanner sc = new Scanner(in);
+            long pid = sc.nextLong();
+            for (Thread t : Thread.getAllStackTraces().keySet()) {
+                if (Data.supported_commands.contains(t.getName()) && t.getId() == pid) {
+                    t.notify();
+                    return;
+                }
+            }
+            System.out.println("\rNo such foreground process");
+        } catch (Exception e) {
+            System.out.println("[RuntimeError] " + e.getMessage());
+        }
     }
 
-    // TODO cd
     // 用法：
     // ① cd
     // ② cd <path>
-    public static void cd(String path) {
-        System.out.println("cd");
+    public static void cd(InputStream in) {
+        try {
+            Scanner sc = new Scanner(in);
+            if (sc.hasNext()) {
+                String target = Common.GetAbsolutePath(sc.next());
+                Path p = Paths.get(target);
+                if (Files.exists(p) && Files.isDirectory(p))
+                    Executor.variables.put("PWD", p.normalize().toString());
+                else
+                    System.out.println("[RuntimeError] No such directory " + p.toString());
+            } else
+                Executor.variables.put("PWD", Executor.variables.get("HOME"));
+
+            System.out.print("\r");
+        } catch (Exception e) {
+            System.out.println("[RuntimeError] " + e.getMessage());
+        }
     }
 
     // 用法：
@@ -30,15 +61,38 @@ public class CMD {
         System.out.flush();
     }
 
-    // TODO dir
     // 用法：
     // ① dir
     // ② dir <path>
-    public static void dir(String path) {
-        System.out.println("dir");
+    public static void dir(InputStream in, OutputStream out) {
+        try {
+            Scanner sc = new Scanner(in);
+            File dir;
+            if (sc.hasNext()) {
+                String target = Common.GetAbsolutePath(sc.next());
+                dir = new File(target);
+                if (!(dir.exists() && dir.isDirectory())) {
+                    System.out.println("[RuntimeError] No such directory: " + target);
+                    return;
+                }
+            } else {
+                dir = new File(Executor.variables.get("PWD"));
+            }
+
+            BufferedWriter out_writer =
+                    new BufferedWriter(new OutputStreamWriter(out));
+            File[] files = dir.listFiles();
+            for (File f : files) {
+                out_writer.write(f.getName() + " ");
+            }
+
+            out_writer.flush();
+            System.out.print("\n\r");
+        } catch (Exception e) {
+            System.out.println("[RuntimeError] " + e.getMessage());
+        }
     }
 
-    // TODO echo
     // 用法：
     // echo <str 1> <str 2> <str 3> ...
     public static void echo(InputStream in, OutputStream out) {
@@ -72,9 +126,19 @@ public class CMD {
         System.exit(code);
     }
 
-    // TODO environ
-    public static void environ() {
-        System.out.println("environ");
+    // 用法:
+    // environ
+    public static void environ(OutputStream out) {
+        try {
+            BufferedWriter out_writer =
+                    new BufferedWriter(new OutputStreamWriter(out));
+            for (Entry<String, String> entry : Executor.variables.entrySet())
+                out_writer.write(entry.getKey() + "\t\t" + entry.getValue() + "\n");
+            out_writer.flush();
+            System.out.print("\r");
+        } catch (Exception e) {
+            System.out.println("[RuntimeError] " + e.getMessage());
+        }
     }
 
     // TODO fg

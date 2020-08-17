@@ -12,7 +12,7 @@ public class Interpreter {
     public static int command_num;
 
     public static void Prompt() {
-        Common.Print(Color.RED_BOLD, Settings.SHELL_NAME);
+        Common.Print(Color.RED_BOLD, Executor.SHELL_NAME);
         Common.Print(Color.GREEN, " → ");
         Common.Print(Color.CYAN_BOLD, Executor.variables.get("PWD"));
         Common.Print(" $ ");

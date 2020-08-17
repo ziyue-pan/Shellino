@@ -118,14 +118,23 @@ public class Command implements Runnable {
             case "environ":
                 CMD.environ(out);
                 break;
+            case "exec":
+                CMD.exec(in);
+                break;
+            case "fg":
+                CMD.fg(in);
+                break;
             case "time":
                 CMD.time(out);
                 break;
             case "exit":
-                CMD.exit(0);
+                CMD.exit(in);
                 break;
             case "jobs":
                 CMD.jobs(out);
+                break;
+            case "quit":
+                CMD.quit();
                 break;
         }
 

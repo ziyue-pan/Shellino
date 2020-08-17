@@ -19,6 +19,10 @@ public class CMD {
     public static void bg(InputStream in) {
         try {
             Scanner sc = new Scanner(in);
+            if (!sc.hasNext()) {
+                System.out.println("[RuntimeError] no pid provided.");
+                return;
+            }
             long pid = sc.nextLong();
             for (Thread t : Thread.getAllStackTraces().keySet()) {
                 if (Data.supported_commands.contains(t.getName()) && t.getId() == pid) {
@@ -113,17 +117,39 @@ public class CMD {
         }
     }
 
-    // TODO exec
     // 用法:
     // exec <command>
-    public static void exec() {
-        System.out.println("exec");
+    public static void exec(InputStream in) {
+        try {
+            Scanner sc = new Scanner(in);
+            if (sc.hasNextLine()) {
+                String c = sc.nextLine();
+                if (c.contains("|")) {
+                    System.out.println("[RuntimeError] exec does not support pipes.");
+                    return;
+                }
+                Interpreter.ProcessCMD(c);
+                System.exit(0);
+            } else
+                System.out.println("[RuntimeError] missing commands.");
+        } catch (Exception e) {
+            System.out.println("[RuntimeError] " + e.getMessage());
+        }
+
     }
 
     // 用法:
     // exit
-    public static void exit(int code) {
-        System.exit(code);
+    public static void exit(InputStream in) {
+        try {
+            Scanner sc = new Scanner(in);
+            if (sc.hasNextInt())
+                System.exit(sc.nextInt());
+            else
+                System.exit(0);
+        } catch (Exception e) {
+            System.exit(1);
+        }
     }
 
     // 用法:
@@ -141,11 +167,26 @@ public class CMD {
         }
     }
 
-    // TODO fg
     // 用法:
     // fg %<pid>
-    public static void fg() {
-        System.out.println("fg");
+    public static void fg(InputStream in) {
+        try {
+            Scanner sc = new Scanner(in);
+            if (!sc.hasNext()) {
+                System.out.println("[RuntimeError] no pid provided.");
+                return;
+            }
+            long pid = sc.nextLong();
+            for (Thread t : Thread.getAllStackTraces().keySet()) {
+                if (Data.supported_commands.contains(t.getName()) && t.getId() == pid) {
+                    t.join();
+                    return;
+                }
+            }
+            System.out.println("[RuntimeError] No such foreground process");
+        } catch (Exception e) {
+            System.out.println("[RuntimeError] " + e.getMessage());
+        }
     }
 
     // TODO help
@@ -153,7 +194,8 @@ public class CMD {
         System.out.println("help");
     }
 
-
+    // 用法:
+    // jobs
     public static void jobs(OutputStream out) {
         try {
             BufferedWriter out_writer =
@@ -214,11 +256,6 @@ public class CMD {
     // TODO unset
     public static void unset() {
         System.out.println("unset");
-    }
-
-    // TODO redirect
-    public static void Redirect() {
-
     }
 
     // TODO myshell

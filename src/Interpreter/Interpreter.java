@@ -45,8 +45,7 @@ public class Interpreter {
                 if (i < command_num - 1) {
                     tmp_commands[i].input_type = IOType.PIPE_IN;
                     tmp_commands[i].output_type = IOType.PIPE_OUT;
-                }
-                else
+                } else
                     tmp_commands[i].input_type = IOType.PIPE_IN;
                 try {
                     tmp_commands[i].pipe_in.connect(tmp_commands[i - 1].pipe_out);

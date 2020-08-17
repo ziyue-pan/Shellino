@@ -10,7 +10,7 @@ import java.util.LinkedHashMap;
 
 
 public class Executor {
-    public static String SHELL_NAME="Shellino"; // SHELL的名称
+    public static String SHELL_NAME = "Shellino"; // SHELL的名称
     private static final InputStream console_in = System.in;
     private static final PrintStream console_out = System.out;
 
@@ -26,6 +26,7 @@ public class Executor {
         // Signal.handle(new Signal("TSTP"), handler);
 
         variables = new LinkedHashMap<>();
+        variables.put("SHELL", System.getProperty("user.dir") + "/Shellino.jar");
         variables.put("HOME", System.getProperty("user.home"));
         variables.put("PWD", System.getProperty("user.home"));
     }
@@ -53,6 +54,7 @@ public class Executor {
         }
 
         for (int i = 0; i < num_command; i++) {
+
             try {
                 if (!commands[i].running) {
                     current_process_queue[i].start();
@@ -62,7 +64,5 @@ public class Executor {
                 throw new ShellException(EType.RuntimeError, "Failed to start process.");
             }
         }
-
-        Executor.ResetRedirect();
     }
 }

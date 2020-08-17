@@ -1,6 +1,8 @@
 
+import Executor.Executor;
 import Interpreter.*;
 import Runtime.*;
+import Utilities.ShellException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,7 +19,14 @@ public class MyShell {
             Interpreter.Prompt();
             input_string = br.readLine();
             if(!input_string.equals("")) {
-                Interpreter.ProcessCMD(input_string);
+                try {
+                    Interpreter.ProcessCMD(input_string);
+                } catch (ShellException e) {
+                    Interpreter.state = State.IDLE;
+                    Interpreter.Reset();
+                    Executor.ResetRedirect();
+                    System.out.println(e.getMessage());
+                }
             }
         }
     }

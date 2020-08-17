@@ -1,12 +1,12 @@
 package Interpreter;
 
-import Executor.*;
-import Utilities.*;
 import Runtime.*;
+import Utilities.*;
 
 import java.io.IOException;
 
 public class Interpreter {
+    public static boolean input_ready = false;
     public static State state = State.IDLE;
     public static Command[] tmp_commands;
     public static int command_num;
@@ -14,8 +14,9 @@ public class Interpreter {
     public static void Prompt() {
         Common.Print(Color.RED_BOLD, Settings.SHELL_NAME);
         Common.Print(Color.GREEN, " → ");
-        Common.Print(Color.CYAN_BOLD, Environment.Variables.get("PWD"));
+        Common.Print(Color.CYAN_BOLD, Executor.variables.get("PWD"));
         Common.Print(" $ ");
+        input_ready = true;
     }
 
     public static void ProcessCMD(String input_string)
@@ -23,7 +24,6 @@ public class Interpreter {
         String[] split_string = input_string.split("\\|");
         command_num = split_string.length;
         tmp_commands = new Command[command_num];
-
 
         for (int i = 0; i < command_num; i++) {
             tmp_commands[i] = new Command();
@@ -33,18 +33,21 @@ public class Interpreter {
                 throw new ShellException(EType.SyntaxError, "Cannot parse empty command");
             if (tmp_commands[i].background && i < command_num - 1)
                 throw new ShellException(EType.SyntaxError, "Cannot backgrounding commands between pipes");
-            if (i > 0 && tmp_commands[i].redirect_in != RedirectType.NONE)
+            if (i > 0 && tmp_commands[i].input_type == IOType.REDIRECT_IN)
                 throw new ShellException(EType.SyntaxError, "Cannot input from pipe and redirection at the same time");
-            if (i < command_num - 1 && tmp_commands[i].redirect_out != RedirectType.NONE)
+            if (i < command_num - 1 && (tmp_commands[i].output_type == IOType.REDIRECT_OUT
+                    || tmp_commands[i].output_type == IOType.REDIRECT_APPEND))
                 throw new ShellException(EType.SyntaxError, "Cannot output to pipe and redirection at the same time");
 
-            if(i==0 && command_num > 1)
-                tmp_commands[i].pipe_type = PipeIOType.PIPEOUT;
+            if (i == 0 && command_num > 1)
+                tmp_commands[i].output_type = IOType.PIPE_OUT;
             if (i > 0) {
-                if(i < command_num - 1)
-                    tmp_commands[i].pipe_type = PipeIOType.BOTH;
+                if (i < command_num - 1) {
+                    tmp_commands[i].input_type = IOType.PIPE_IN;
+                    tmp_commands[i].output_type = IOType.PIPE_OUT;
+                }
                 else
-                    tmp_commands[i].pipe_type = PipeIOType.PIPEIN;
+                    tmp_commands[i].input_type = IOType.PIPE_IN;
                 try {
                     tmp_commands[i].pipe_in.connect(tmp_commands[i - 1].pipe_out);
                 } catch (IOException e) {
@@ -52,8 +55,12 @@ public class Interpreter {
                             "Cannot create pipes between " + tmp_commands[i - 1].name + " and " + tmp_commands[i].name);
                 }
             }
+
+            if (tmp_commands[i].background && i < command_num - 1)
+                throw new ShellException(EType.SyntaxError, "Cannot set background command between pipes");
         }
-        System.out.println();
+
+        Executor.SetupProcess(tmp_commands, command_num);
     }
 
     public static void ProcessSingle(int idx, String single_string)
@@ -75,7 +82,7 @@ public class Interpreter {
                     switch (tokens[i]) {
                         case "<":
                             if (i < tokens.length - 1) {
-                                tmp_commands[idx].redirect_in = RedirectType.OVERRIDE;
+                                tmp_commands[idx].input_type = IOType.REDIRECT_IN;
                                 tmp_commands[idx].infile = tokens[i + 1];
                                 i++;
                                 state = State.REDIRECT_IN_PARSED;
@@ -86,7 +93,7 @@ public class Interpreter {
                             break;
                         case ">":
                             if (i < tokens.length - 1) {
-                                tmp_commands[idx].redirect_out = RedirectType.OVERRIDE;
+                                tmp_commands[idx].output_type = IOType.REDIRECT_OUT;
                                 tmp_commands[idx].outfile = tokens[i + 1];
                                 i++;
                                 state = State.REDIRECT_OUT_PARSED;
@@ -95,20 +102,9 @@ public class Interpreter {
                                         EType.SyntaxError, "Missing path for redirect-out file");
                             }
                             break;
-                        case "<<":
-                            if (i < tokens.length - 1) {
-                                tmp_commands[idx].redirect_in = RedirectType.APPEND;
-                                tmp_commands[idx].infile = tokens[i + 1];
-                                i++;
-                                state = State.REDIRECT_IN_PARSED;
-                            } else {
-                                throw new ShellException(
-                                        EType.SyntaxError, "Missing path for redirect-in file");
-                            }
-                            break;
                         case ">>":
                             if (i < tokens.length - 1) {
-                                tmp_commands[idx].redirect_in = RedirectType.APPEND;
+                                tmp_commands[idx].output_type = IOType.REDIRECT_APPEND;
                                 tmp_commands[idx].outfile = tokens[i + 1];
                                 i++;
                                 state = State.REDIRECT_OUT_PARSED;
@@ -131,7 +127,7 @@ public class Interpreter {
                     switch (tokens[i]) {
                         case ">":
                             if (i < tokens.length - 1) {
-                                tmp_commands[idx].redirect_out = RedirectType.OVERRIDE;
+                                tmp_commands[idx].output_type = IOType.REDIRECT_OUT;
                                 tmp_commands[idx].outfile = tokens[i + 1];
                                 i++;
                                 state = State.REDIRECT_BOTH_PARSED;
@@ -142,7 +138,7 @@ public class Interpreter {
                             break;
                         case ">>":
                             if (i < tokens.length - 1) {
-                                tmp_commands[idx].redirect_in = RedirectType.APPEND;
+                                tmp_commands[idx].output_type = IOType.REDIRECT_APPEND;
                                 tmp_commands[idx].outfile = tokens[i + 1];
                                 i++;
                                 state = State.REDIRECT_BOTH_PARSED;
@@ -164,18 +160,7 @@ public class Interpreter {
                     switch (tokens[i]) {
                         case "<":
                             if (i < tokens.length - 1) {
-                                tmp_commands[idx].redirect_in = RedirectType.OVERRIDE;
-                                tmp_commands[idx].infile = tokens[i + 1];
-                                i++;
-                                state = State.REDIRECT_BOTH_PARSED;
-                            } else {
-                                throw new ShellException(
-                                        EType.SyntaxError, "Missing path for redirect-in file");
-                            }
-                            break;
-                        case "<<":
-                            if (i < tokens.length - 1) {
-                                tmp_commands[idx].redirect_in = RedirectType.APPEND;
+                                tmp_commands[idx].input_type = IOType.REDIRECT_IN;
                                 tmp_commands[idx].infile = tokens[i + 1];
                                 i++;
                                 state = State.REDIRECT_BOTH_PARSED;
@@ -197,6 +182,7 @@ public class Interpreter {
                     throw new ShellException(EType.SyntaxError, "Invalid token: " + tokens[i]);
             }
         }
+        state = State.IDLE;
     }
 
     public static void Reset() {

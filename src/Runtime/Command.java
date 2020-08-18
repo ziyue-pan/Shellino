@@ -133,6 +133,9 @@ public class Command implements Runnable {
             case "jobs":
                 CMD.jobs(out);
                 break;
+            case "pwd":
+                CMD.pwd(out);
+                break;
             case "quit":
                 CMD.quit();
                 break;

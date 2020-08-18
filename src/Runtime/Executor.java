@@ -29,6 +29,7 @@ public class Executor {
         variables.put("SHELL", System.getProperty("user.dir") + "/Shellino.jar");
         variables.put("HOME", System.getProperty("user.home"));
         variables.put("PWD", System.getProperty("user.home"));
+        variables.put("UMASK", "022");
     }
 
     public static void SetupProcess(Command[] commands, int num_command)

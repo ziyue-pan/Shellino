@@ -213,8 +213,17 @@ public class CMD {
         }
     }
 
-    public static void pwd() {
-        System.out.println(Executor.variables.get("PWD"));
+    // 用法:
+    // pwd
+    public static void pwd(OutputStream out) {
+        try {
+            BufferedWriter out_writer =
+                    new BufferedWriter(new OutputStreamWriter(out));
+            out_writer.write(Executor.variables.get("PWD"));
+            out_writer.flush();
+        } catch (Exception e) {
+            System.out.println("[RuntimeError] " + e.getMessage());
+        }
     }
 
     public static void quit() {
@@ -236,6 +245,8 @@ public class CMD {
         System.out.println("test");
     }
 
+    // 用法:
+    // time
     public static void time(OutputStream out) {
         try {
             BufferedWriter out_writer =
@@ -248,8 +259,31 @@ public class CMD {
         }
     }
 
-    // TODO umask
-    public static void umask() {
+    // 用法:
+    // ① umask
+    // ② umask <val>
+    public static void umask(InputStream in, OutputStream out) {
+        try {
+            Scanner sc = new Scanner(in);
+
+            if (sc.hasNextInt(8)) {
+                int new_umask = sc.nextInt(8);
+                if (new_umask >= 0 && new_umask <= 0777) {
+                    Executor.variables.put("UMASK", Integer.toOctalString(new_umask));
+                } else {
+                    System.out.println("[RuntimeError] Umask out of range: "
+                            + Integer.toOctalString(new_umask));
+                }
+            } else {
+                BufferedWriter out_writer =
+                        new BufferedWriter(new OutputStreamWriter(out));
+                out_writer.write(Integer.parseInt(
+                        Executor.variables.get("UMASK"), 8));
+                out_writer.flush();
+            }
+        } catch (Exception e) {
+
+        }
         System.out.println("umask");
     }
 

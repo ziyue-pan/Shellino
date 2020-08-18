@@ -166,6 +166,9 @@ public class Command implements Runnable {
             case "help":
                 CMD.help(out);
                 break;
+            case "more help":
+                CMD.more_help();
+                break;
         }
     }
 }

@@ -3,13 +3,14 @@ package Runtime;
 import Interpreter.Data;
 import Interpreter.Interpreter;
 import Utilities.Common;
-import jdk.internal.util.xml.impl.Input;
 
 import java.io.*;
+import java.nio.Buffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Scanner;
 
@@ -204,9 +205,47 @@ public class CMD {
         }
     }
 
-    // TODO more help
+    // 用法:
+    // more help
     public static void more_help() {
+        try {
+            List<String> lines = Files.readAllLines(
+                    Paths.get(System.getProperty("user.dir") + "/Manual.md"));
+            int page_num = 0, max_lines = lines.size(), max_pages = max_lines / Common.line_num;
+            String choice;
+            Scanner sc = new Scanner(System.in);
+            while (true) {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+                System.out.printf(">>> Page %d (Total: %d)\n", page_num + 1, max_pages);
+                for (int i = page_num * Common.line_num;
+                     i < Math.min(max_lines, (page_num + 1) * Common.line_num); i++) {
+                    System.out.println(lines.get(i));
+                }
+                System.out.print(":");
+                choice = sc.nextLine();
+                switch (choice) {
+                    case "q":
+                        return;
+                    case "u":
+                        if (page_num > 0)
+                            page_num--;
+                        break;
+                    case "d":
+                        if (page_num < max_pages)
+                            page_num++;
+                        break;
+                    default:
+                        System.out.println("Wrong choice!");
+                        sc.nextLine();
+                        break;
+                }
+            }
 
+
+        } catch (Exception e) {
+            System.out.println("[RuntimeError] " + e.getMessage());
+        }
     }
 
     // 用法:

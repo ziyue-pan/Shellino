@@ -7,6 +7,7 @@ public class Common {
     public static final String RED_BOLD = "\033[1;31m";
     public static final String GREEN = "\033[0;32m";
     public static final String CYAN_BOLD = "\033[1;36m";
+    public static final int line_num = 24;
 
     public static void Print(String msg) {
         System.out.print(msg);

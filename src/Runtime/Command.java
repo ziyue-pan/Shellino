@@ -81,12 +81,14 @@ public class Command implements Runnable {
                 break;
             case REDIRECT_APPEND:
                 try {
-                    out = new FileOutputStream(outfile, true);
+                    out = new FileOutputStream(Common.GetAbsolutePath(outfile), true);
                 } catch (Exception e) {
                     try {
-                        out = new FileOutputStream(Executor.variables.get("PWD") + "/" + infile, true);
+                        File file = new File(Common.GetAbsolutePath(outfile));
+                        file.createNewFile();
+                        out = new FileOutputStream(Common.GetAbsolutePath(outfile), true);
                     } catch (Exception ee) {
-                        System.out.println("[RuntimeError] Failed to create output stream.");
+                        System.out.println("[RuntimeError] Failed to create output stream to" + outfile);
                         return;
                     }
                 }
@@ -139,7 +141,31 @@ public class Command implements Runnable {
             case "quit":
                 CMD.quit();
                 break;
+            case "set":
+                CMD.set(in);
+                break;
+            case "shift":
+                if (args.size() > 0) {
+                    try {
+                        int shamt = Integer.parseInt(args.get(0));
+                        if (shamt >= 0) {
+                            CMD.shift(in, out, shamt, input_type == IOType.ARGS_IN);
+                        } else {
+                            System.out.println("[RuntimeError] Shift amount out of range.");
+                        }
+                    } catch (Exception e) {
+                        System.out.println("[RuntimeError] Cannot parse the shift amount.");
+                    }
+                } else {
+                    System.out.println("[RuntimeError] Must give a shift amount.");
+                }
+                break;
+            case "unset":
+                CMD.unset(in);
+                break;
+            case "help":
+                CMD.help(out);
+                break;
         }
-
     }
 }

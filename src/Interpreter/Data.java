@@ -24,5 +24,13 @@ public class Data {
         add("umask");
         add("unset");
         add("myshell");
+        add("more");
+    }};
+
+    public static final HashSet<String> secured_variables = new HashSet<String>() {{
+        add("PWD");
+        add("HOME");
+        add("SHELL");
+        add("UMASK");
     }};
 }

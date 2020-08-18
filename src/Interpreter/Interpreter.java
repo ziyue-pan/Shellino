@@ -70,6 +70,14 @@ public class Interpreter {
                 case IDLE: {
                     if (Data.supported_commands.contains(tokens[i])) {
                         tmp_commands[idx].name = tokens[i];
+                        if (tokens[i].equals("more"))
+                            if (i < tokens.length - 1 && tokens[i + 1].equals("help")) {
+                                tmp_commands[idx].name = "more help";
+                                i++;
+                            } else {
+                                throw new ShellException(
+                                        EType.SyntaxError, "Invalid more filter object.");
+                            }
                         state = State.COMMAND_PARSED;
                     } else {
                         throw new ShellException(

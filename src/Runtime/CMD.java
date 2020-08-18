@@ -3,6 +3,7 @@ package Runtime;
 import Interpreter.Data;
 import Interpreter.Interpreter;
 import Utilities.Common;
+import jdk.internal.util.xml.impl.Input;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -189,9 +190,23 @@ public class CMD {
         }
     }
 
-    // TODO help
-    public static void help() {
-        System.out.println("help");
+    // 用法:
+    // help
+    public static void help(OutputStream out) {
+        try {
+            BufferedWriter out_writer =
+                    new BufferedWriter(new OutputStreamWriter(out));
+            Files.copy(Paths.get(System.getProperty("user.dir") + "/Manual.md"), out);
+            out_writer.write("\n");
+            out_writer.flush();
+        } catch (Exception e) {
+            System.out.println("[RuntimeError] " + e.getMessage());
+        }
+    }
+
+    // TODO more help
+    public static void more_help() {
+
     }
 
     // 用法:
@@ -230,14 +245,51 @@ public class CMD {
         System.exit(0);
     }
 
-    // TODO set
-    public static void set() {
-        System.out.println("set");
+    // 用法:
+    // set <key> <value>
+    public static void set(InputStream in) {
+        try {
+            Scanner sc = new Scanner(in);
+            String key, value;
+            try {
+                key = sc.next();
+                value = sc.next();
+            } catch (Exception e) {
+                System.out.println("[RuntimeError] Cannot parse key & value.");
+                return;
+            }
+            if (Data.secured_variables.contains(key)) {
+                System.out.println("[RuntimeError] Cannot set secured variables.");
+            } else {
+                Executor.variables.put(key, value);
+            }
+        } catch (Exception e) {
+            System.out.println("[RuntimeError] " + e.getMessage());
+        }
     }
 
-    // TODO shift
-    public static void shift() {
-        System.out.println("shift");
+    // 用法:
+    // shift <val> <arg1> <arg2> <arg3>
+    public static void shift(InputStream in, OutputStream out, int shamt, boolean args_in) {
+        try {
+            Scanner sc = new Scanner(in);
+            BufferedWriter out_writer =
+                    new BufferedWriter(new OutputStreamWriter(out));
+            shamt += args_in ? 1 : 0;
+            String word;
+            int cast = 0;
+            while (sc.hasNext()) {
+                word = sc.next();
+                if (cast < shamt)
+                    cast++;
+                else
+                    out_writer.write(word + " ");
+            }
+            out_writer.write("\n");
+            out_writer.flush();
+        } catch (Exception e) {
+            System.out.println("[RuntimeError] " + e.getMessage());
+        }
     }
 
     // TODO test
@@ -282,14 +334,32 @@ public class CMD {
                 out_writer.flush();
             }
         } catch (Exception e) {
-
+            System.out.println("[RuntimeError] " + e.getMessage());
         }
-        System.out.println("umask");
     }
 
-    // TODO unset
-    public static void unset() {
-        System.out.println("unset");
+
+    // 用法:
+    // unset <key>
+    public static void unset(InputStream in) {
+        try {
+            Scanner sc = new Scanner(in);
+            if (sc.hasNext()) {
+                String key = sc.next();
+                if (Data.secured_variables.contains(key)) {
+                    System.out.println("[RuntimeError] Cannot unset secured variables.");
+                } else if (Executor.variables.containsKey(key)) {
+                    Executor.variables.remove(key);
+                } else {
+                    System.out.println("[RuntimeError] No such key.");
+                }
+            } else {
+                System.out.println("[RuntimeError] No key provided.");
+            }
+        } catch (Exception e) {
+            System.out.println("[RuntimeError] " + e.getMessage());
+        }
+
     }
 
     // TODO myshell

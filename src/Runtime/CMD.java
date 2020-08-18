@@ -331,9 +331,25 @@ public class CMD {
         }
     }
 
-    // TODO test
-    public static void test() {
-        System.out.println("test");
+    // 用法:
+    // test -n <str>
+    // test -z <str>
+    public static void test(InputStream in, OutputStream out,
+                            boolean exist, boolean args_in) {
+        try {
+            Scanner sc = new Scanner(in);
+            BufferedWriter out_writer =
+                    new BufferedWriter(new OutputStreamWriter(out));
+            if (args_in)
+                sc.next();
+            if (exist && sc.hasNext() || (!exist && !sc.hasNext()))
+                out_writer.write("true\n");
+            else
+                out_writer.write("false\n");
+            out_writer.flush();
+        } catch (Exception e) {
+            System.out.println("[RuntimeError] " + e.getMessage());
+        }
     }
 
     // 用法:
@@ -402,7 +418,30 @@ public class CMD {
     }
 
     // TODO myshell
-    public static void myshell() {
+    public static void myshell(InputStream in, OutputStream out) {
+        try {
+            Scanner sc = new Scanner(in);
+            String filename;
+            if (sc.hasNext())
+                filename = sc.next();
+            else {
+                System.out.print("Enter a file path: ");
+                sc = new Scanner(System.in);
+                filename = sc.nextLine();
+            }
+            filename = Common.GetAbsolutePath(filename);
 
+            try {
+                File batchfile = new File(filename);
+                BufferedReader br = new BufferedReader(new FileReader(batchfile));
+                String line;
+                while ((line = br.readLine()) != null)
+                    Interpreter.ProcessCMD(line);
+            } catch (Exception fe) {
+                System.out.println("[RuntimeError] Cannot read file: " + filename);
+            }
+        } catch (Exception e) {
+            System.out.println("[RuntimeError] " + e.getMessage());
+        }
     }
 }

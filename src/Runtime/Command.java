@@ -169,6 +169,22 @@ public class Command implements Runnable {
             case "more help":
                 CMD.more_help();
                 break;
+            case "test":
+                if (args.size() > 0) {
+                    if (args.get(0).equals("-z")) {
+                        CMD.test(in, out, false, input_type == IOType.ARGS_IN);
+                    } else if (args.get(0).equals("-n")) {
+                        CMD.test(in, out, true, input_type == IOType.ARGS_IN);
+                    } else {
+                        System.out.println("[RuntimeError] Invalid test option: " + args.get(0));
+                    }
+                } else {
+                    System.out.println("[RuntimeError] Must give an option of test command.");
+                }
+                break;
+            case "myshell":
+                CMD.myshell(in, out);
+                break;
         }
     }
 }

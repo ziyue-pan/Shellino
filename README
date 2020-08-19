@@ -96,17 +96,38 @@ under JDK8.
 > Description:  exit the shell with code 0.
 
 
-> Command:      
-> Description:
+> Command:      set <key> <value>
+> Description:  set temporary environment variables. 
 
 
-> Command:      
-> Description:
+> Command:      shift <amount> <arg1> <arg2> <arg3> ...
+> Description:  given a shift amount and a list of arguments,
+              shift them by the given amount. 
+                for example, if the shift amount is 2, then
+              <arg1> <- <arg3>, <arg2> <- <arg4>, ...
 
 
-> Command:      
-> Description:
+> Command:      ① test -n <str>
+                ② test -z <str>
+> Description:  test the argument list. if the given option
+              is '-n', then the command output false if the
+              argument is a null string, otherwise true. '-z'
+              vice versa.
 
 
-> Command:      
-> Description:
+> Command:      ① umask
+                ② umask <val>
+> Description:  set the new umask or output the current mask.
+              if no given value, then the command output the 
+              current umask. or it check 
+
+
+> Command:      unset
+> Description:  delete an environment variable, except the 
+              system variables.
+
+
+> Command:      myshell <batchfile>
+> Description:  use the shell to execute the command line by
+              line from a given batchfile.
+

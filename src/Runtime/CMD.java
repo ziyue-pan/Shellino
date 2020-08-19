@@ -416,10 +416,11 @@ public class CMD {
         } catch (Exception e) {
             System.out.println("[RuntimeError] " + e.getMessage());
         }
-
     }
 
-    // TODO myshell
+
+    // 用法:
+    // myshell <batchfile>
     public static void myshell(InputStream in, OutputStream out) {
         try {
             Scanner sc = new Scanner(in);

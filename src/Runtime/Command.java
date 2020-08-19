@@ -163,6 +163,9 @@ public class Command implements Runnable {
             case "unset":
                 CMD.unset(in);
                 break;
+            case "umask":
+                CMD.umask(in, out);
+                break;
             case "help":
                 CMD.help(out);
                 break;

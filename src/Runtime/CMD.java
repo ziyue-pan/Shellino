@@ -197,7 +197,7 @@ public class CMD {
         try {
             BufferedWriter out_writer =
                     new BufferedWriter(new OutputStreamWriter(out));
-            Files.copy(Paths.get(System.getProperty("user.dir") + "/Manual.md"), out);
+            Files.copy(Paths.get(System.getProperty("user.dir") + "/README"), out);
             out_writer.write("\n");
             out_writer.flush();
         } catch (Exception e) {
@@ -210,7 +210,7 @@ public class CMD {
     public static void more_help() {
         try {
             List<String> lines = Files.readAllLines(
-                    Paths.get(System.getProperty("user.dir") + "/Manual.md"));
+                    Paths.get(System.getProperty("user.dir") + "/README"));
             int page_num = 0, max_lines = lines.size(), max_pages = max_lines / Common.line_num;
             String choice;
             Scanner sc = new Scanner(System.in);

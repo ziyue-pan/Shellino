@@ -1,0 +1,40 @@
+*************************************************************
+ ____    __              ___    ___                          
+/\  _`\ /\ \            /\_ \  /\_ \    __                   
+\ \,\L\_\ \ \___      __\//\ \ \//\ \  /\_\    ___     ___   
+ \/_\__ \\ \  _ `\  /'__`\\ \ \  \ \ \ \/\ \ /' _ `\  / __`\ 
+   /\ \L\ \ \ \ \ \/\  __/ \_\ \_ \_\ \_\ \ \/\ \/\ \/\ \L\ \
+   \ `\____\ \_\ \_\ \____\/\____\/\____\\ \_\ \_\ \_\ \____/
+    \/_____/\/_/\/_/\/____/\/____/\/____/ \/_/\/_/\/_/\/___/ 
+
+*************************************************************
+
+  Hello there, this is a tiny shell emulator -- Shellino. It 
+is programmed by Ziyue Pan, supporting several commands.
+
+  This program follows MIT license, is free for anyone or any
+purpose. Shellino is programmed in Java by Intellj IDEA, and 
+passes building on linux. The version of JDK should not be 
+under JDK8.  
+
+>> How to build
+--------------
+
+  $ git clone https://github.com/PAN-Ziyue/Shellino
+
+  $ idea.bat ./Shellino
+
+  * <Build Artifact>
+
+  $ java -jar ./your/path/to/Shellino.jar
+
+>> Use commands
+--------------
+
+
+
+
+
+
+
+

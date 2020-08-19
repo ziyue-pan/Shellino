@@ -170,7 +170,7 @@ public class CMD {
     }
 
     // 用法:
-    // fg %<pid>
+    // fg <%pid>
     public static void fg(InputStream in) {
         try {
             Scanner sc = new Scanner(in);
@@ -280,6 +280,8 @@ public class CMD {
         }
     }
 
+    // 用法:
+    // quit
     public static void quit() {
         System.exit(0);
     }

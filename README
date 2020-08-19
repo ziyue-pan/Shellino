@@ -31,10 +31,82 @@ under JDK8.
 >> Use commands
 --------------
 
+> Command:      bg <%pid>
+> Description:  set foreground process to foreground.
 
 
+> Command:      ① cd <path>
+                ② cd 
+> Description:  change directory to the given path.
+                if no given path, change to home dir.
 
 
+> Command:      clr
+> Description:  clear the console
 
 
+> Command:      ① dir
+                ② dir <path>
+> Description:  list all the content of the given path.
+                if no given path, list the content of 
+              current path.
 
+
+> Command:      echo <str 1> <str 2> <str 3> ...
+> Description:  print the given strings to console.
+
+
+> Command:      exec <command>
+> Description:  execute the current command to replace the  
+              current process (shutdown the shell). 
+
+
+> Command:      ① exit
+                ② exit <exit code>
+> Description:  exit with the given exit code. 
+                if no code given, exit with code 0.
+
+
+> Command:      environ
+> Description:  list all the environment variables
+
+
+> Command:      fg <%pid>
+> Description:  set the background process to foreground.
+
+
+> Command:      help
+> Description:  print help manual (this document).
+
+
+> Command:      more help
+> Description:  print interactive help manual.
+                enter "u" for up, "d" for down, "q" for quit.
+
+
+> Command:      jobs
+> Description:  list all processes.
+
+
+> Command:      pwd
+> Description:  print current directory.
+
+
+> Command:      quit
+> Description:  exit the shell with code 0.
+
+
+> Command:      
+> Description:
+
+
+> Command:      
+> Description:
+
+
+> Command:      
+> Description:
+
+
+> Command:      
+> Description:

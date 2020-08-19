@@ -10,7 +10,8 @@
 *************************************************************
 
   Hello there, this is a tiny shell emulator -- Shellino. It 
-is programmed by Ziyue Pan, supporting several commands.
+is programmed by Ziyue Pan, supporting several commands for
+common use.
 
   This program follows MIT license, is free for anyone or any
 purpose. Shellino is programmed in Java by Intellj IDEA, and 
@@ -18,7 +19,7 @@ passes building on linux. The version of JDK should not be
 under JDK8.  
 
 >> How to build
---------------
+---------------
 
   $ git clone https://github.com/PAN-Ziyue/Shellino
 
@@ -29,7 +30,7 @@ under JDK8.
   $ java -jar ./your/path/to/Shellino.jar
 
 >> Use commands
---------------
+---------------
 
 > Command:      bg <%pid>
 > Description:  set foreground process to foreground.
